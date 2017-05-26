@@ -1,57 +1,5 @@
 const rijndael = require('./rijndael');
 
-function computeAutn(sqn, ak, amf, mac_a, autn) {
-  let i;
-
-  /* xor SQN and AK */
-  for (i = 0; i < 6; i++) {
-    autn[i] = sqn[i] ^ ak[i];
-  }
-
-  // @todo use autn.set
-
-  /* append AMF */
-  for (i = 0; i < 2; i++) {
-    autn[i + 6] = amf[i];
-  }
-
-  /* append MAC */
-  for (i = 0; i < 8; i++) {
-    autn[i + 8] = mac_a[i];
-  }
-}
-
-function computeAv(rand, res, ck, ik, autn, av) {
-  let i;
-
-  // @todo use av.set
-
-  /* put RAND */
-  for (i = 0; i < 16; i++) {
-    av[i] = rand[i];
-  }
-
-  /* append XRES */
-  for (i = 0; i < 8; i++) {
-    av[i + 16] = res[i];
-  }
-
-  /* append CK */
-  for (i = 0; i < 16; i++) {
-    av[i + 24] = ck[i];
-  }
-
-  /* append IK */
-  for (i = 0; i < 16; i++) {
-    av[i + 40] = ik[i];
-  }
-
-  /* append AUTN */
-  for (i = 0; i < 16; i++) {
-    av[i + 56] = autn[i];
-  }
-}
-
 module.exports = (op) => {
   /*-------------------------------------------------------------------
    * Algorithm f1
@@ -316,14 +264,6 @@ module.exports = (op) => {
 
     f5star(k, rand, ak_s);
 
-    const autn = new Uint8Array(16);
-
-    computeAutn(sqn, ak, amf, mac_a, autn);
-
-    const av = new Uint8Array(72);
-
-    computeAv(rand, res, ck, ik, autn, av);
-
     return {
       mac_a,
       res,
@@ -331,9 +271,7 @@ module.exports = (op) => {
       ik,
       ak,
       mac_s,
-      ak_s,
-      autn,
-      av
+      ak_s
     };
   }
 
