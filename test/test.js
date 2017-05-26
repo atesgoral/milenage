@@ -1,28 +1,23 @@
+const test = require('ava').test;
+
 const milenage = require('..');
 
-function hexStringToUint8Array(s) {
-  return new Uint8Array(s.replace(/(..(?!$))/g, '$1,').split(',').map((xx) => parseInt(xx, 16)));
+function u8a(s) {
+  return Uint8Array.from(Buffer.from(s, 'hex'));
 }
 
-const op = hexStringToUint8Array('00112233445566778899AABBCCDDEEFF');
-const amf = hexStringToUint8Array('0000');
+test((t) => {
+  const op = u8a('00112233445566778899AABBCCDDEEFF');
+  const amf = u8a('0000');
 
-const key = hexStringToUint8Array('11111111111111111111111111111111');
-const rand = hexStringToUint8Array('55555555555555555555555555555555');
-const sqn = hexStringToUint8Array('000000000001');
+  const key = u8a('11111111111111111111111111111111');
+  const rand = u8a('55555555555555555555555555555555');
+  const sqn = u8a('000000000001');
 
-const mo = milenage(op).generate(key, rand, sqn, amf);
+  const mo = milenage(op).generate(key, rand, sqn, amf);
 
-for (var p in mo) {
-  console.log(p, Buffer.from(mo[p]).toString('hex'));
-}
-
-/* @todo assert
-
-res = 84 0b 43 b1 00 c3 d6 83
-ck = 54 6a b8 2e 49 29 16 da cb af 66 ba 9d 7e 66 54
-ik = da d4 9d 69 41 f9 b9 59 63 a2 54 ff 6e 1c 31 4c
-ak = 7e 23 91 70 21 cb
-autn = 7e 23 91 70 21 ca 00 00 f8 60 47 d2 eb 76 59 59
-
-*/
+  t.deepEqual(mo.res, u8a('840b43b100c3d683'));
+  t.deepEqual(mo.ck, u8a('546ab82e492916dacbaf66ba9d7e6654'));
+  t.deepEqual(mo.ik, u8a('dad49d6941f9b95963a254ff6e1c314c'));
+  t.deepEqual(mo.ak, u8a('7e23917021cb'));
+});
