@@ -1,6 +1,6 @@
 const rijndael = require('./rijndael');
 
-module.exports = (op) => {
+module.exports = function Milenage(op, k) {
   /*-------------------------------------------------------------------
    * Algorithm f1
    *-------------------------------------------------------------------
@@ -10,7 +10,9 @@ module.exports = (op) => {
    * field AMF.
    *
    *-----------------------------------------------------------------*/
-  function f1(k, rand, sqn, amf, mac_a) {
+  function f1(rand, sqn, amf) {
+    const mac_a = new Uint8Array(8);
+
     const op_c = new Uint8Array(16);
     const temp = new Uint8Array(16);
     const in1 = new Uint8Array(16);
@@ -54,6 +56,8 @@ module.exports = (op) => {
 
     for (i = 0; i < 8; i++)
       mac_a[i] = out1[i];
+
+    return { mac_a };
   }
 
    /*-------------------------------------------------------------------
@@ -64,7 +68,12 @@ module.exports = (op) => {
     * confidentiality key CK, integrity key IK and anonymity key AK.
     *
     *-----------------------------------------------------------------*/
-  function f2345(k, rand, res, ck, ik, ak) {
+  function f2345(rand) {
+    const res = new Uint8Array(8);
+    const ck = new Uint8Array(16);
+    const ik = new Uint8Array(16);
+    const ak = new Uint8Array(6);
+
     const op_c = new Uint8Array(16);
     const temp = new Uint8Array(16);
     const out = new Uint8Array(16);
@@ -133,6 +142,8 @@ module.exports = (op) => {
 
     for (i = 0; i < 16; i++)
       ik[i] = out[i];
+
+    return { res, ck, ik, ak };
   }
 
   /*-------------------------------------------------------------------
@@ -144,7 +155,9 @@ module.exports = (op) => {
    * field AMF.
    *
    *-----------------------------------------------------------------*/
-  function f1star(k, rand, sqn, amf, mac_s) {
+  function f1star(rand, sqn, amf) {
+    const mac_s = new Uint8Array(8);
+
     const op_c = new Uint8Array(16);
     const temp = new Uint8Array(16);
     const in1 = new Uint8Array(16);
@@ -188,6 +201,8 @@ module.exports = (op) => {
 
     for (i = 0; i < 8; i++)
       mac_s[i] = out1[i + 8];
+
+    return { mac_s };
   }
 
   /*-------------------------------------------------------------------
@@ -198,7 +213,9 @@ module.exports = (op) => {
    * anonymity key AK.
    *
    *-----------------------------------------------------------------*/
-  function f5star(k, rand, ak) {
+  function f5star(rand) {
+    const ak_s = new Uint8Array(8);
+
     const op_c = new Uint8Array(16);
     const temp = new Uint8Array(16);
     const out = new Uint8Array(16);
@@ -228,7 +245,9 @@ module.exports = (op) => {
       out[i] ^= op_c[i];
 
     for (i = 0; i < 6; i++)
-      ak[i] = out[i];
+      ak_s[i] = out[i];
+
+    return { ak_s };
   }
 
   /*-------------------------------------------------------------------
@@ -244,38 +263,10 @@ module.exports = (op) => {
       op_c[i] ^= op[i];
   }
 
-  function generate(k, rand, sqn, amf) {
-    const mac_a = new Uint8Array(8);
-
-    f1(k, rand, sqn, amf, mac_a);
-
-    const res = new Uint8Array(8);
-    const ck = new Uint8Array(16);
-    const ik = new Uint8Array(16);
-    const ak = new Uint8Array(6);
-
-    f2345(k, rand, res, ck, ik, ak);
-
-    const mac_s = new Uint8Array(8);
-
-    f1star(k, rand, sqn, amf, mac_s);
-
-    const ak_s = new Uint8Array(8);
-
-    f5star(k, rand, ak_s);
-
-    return {
-      mac_a,
-      res,
-      ck,
-      ik,
-      ak,
-      mac_s,
-      ak_s
-    };
-  }
-
   return {
-    generate
+    f1,
+    f2345,
+    f1star,
+    f5star
   };
 };

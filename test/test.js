@@ -1,6 +1,6 @@
 const test = require('ava').test;
 
-const milenage = require('..');
+const Milenage = require('..');
 
 function u8a(s) {
   return Uint8Array.from(Buffer.from(s, 'hex'));
@@ -14,10 +14,20 @@ test((t) => {
   const rand = u8a('55555555555555555555555555555555');
   const sqn = u8a('000000000001');
 
-  const mo = milenage(op).generate(key, rand, sqn, amf);
+  const milenage = new Milenage(op, key);
 
-  t.deepEqual(mo.res, u8a('840b43b100c3d683'));
-  t.deepEqual(mo.ck, u8a('546ab82e492916dacbaf66ba9d7e6654'));
-  t.deepEqual(mo.ik, u8a('dad49d6941f9b95963a254ff6e1c314c'));
-  t.deepEqual(mo.ak, u8a('7e23917021cb'));
+  const { mac_a } = milenage.f1(rand, sqn, amf);
+  const { res, ck, ik, ak } = milenage.f2345(rand);
+
+  const { mac_s } = milenage.f1star(rand, sqn, amf);
+  const { ak_s } = milenage.f5star(rand);
+
+  t.deepEqual(mac_a, u8a('f86047d2eb765959'));
+  t.deepEqual(res, u8a('840b43b100c3d683'));
+  t.deepEqual(ck, u8a('546ab82e492916dacbaf66ba9d7e6654'));
+  t.deepEqual(ik, u8a('dad49d6941f9b95963a254ff6e1c314c'));
+  t.deepEqual(ak, u8a('7e23917021cb'));
+
+  t.deepEqual(mac_s, u8a('357e7426980abe63'));
+  t.deepEqual(ak_s, u8a('429a4587dce30000'));
 });
