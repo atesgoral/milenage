@@ -11,27 +11,25 @@ module.exports = function Milenage(op, k) {
    *
    *-----------------------------------------------------------------*/
   function f1(rand, sqn, amf) {
-    const mac_a = new Uint8Array(8);
-
-    const in1 = new Uint8Array(16);
-    const rijndaelInput = new Uint8Array(16);
-    let i;
-
     const cipher = crypto.createCipheriv('aes-128-ecb', k, Buffer.alloc(0));
 
     const op_c = computeOpc(cipher);
 
-    for (i = 0; i < 16; i++) // @todo unroll?
+    const rijndaelInput = new Uint8Array(16);
+
+    for (let i = 0; i < 16; i++) // @todo unroll?
       rijndaelInput[i] = rand[i] ^ op_c[i];
 
     const temp = Uint8Array.from(cipher.update(rijndaelInput));
 
-    for (i = 0; i < 6; i++) { // @todo unroll?
+    const in1 = new Uint8Array(16);
+
+    for (let i = 0; i < 6; i++) { // @todo unroll?
       in1[i] = sqn[i];
       in1[i + 8] = sqn[i];
     }
 
-    for (i = 0; i < 2; i++) { // @todo unroll?
+    for (let i = 0; i < 2; i++) { // @todo unroll?
       in1[i + 6] = amf[i];
       in1[i + 14] = amf[i];
     }
@@ -39,19 +37,21 @@ module.exports = function Milenage(op, k) {
     /* XOR op_c and in1, rotate by r1=64, and XOR *
      * on the constant c1 (which is all zeroes) */
 
-    for (i = 0; i < 16; i++)
+    for (let i = 0; i < 16; i++)
       rijndaelInput[(i + 8) % 16] = in1[i] ^ op_c[i];
 
     /* XOR on the value temp computed before */
-    for (i = 0; i < 16; i++)
+    for (let i = 0; i < 16; i++)
       rijndaelInput[i] ^= temp[i];
 
     const out1 = Uint8Array.from(cipher.update(rijndaelInput));
 
-    for (i = 0; i < 16; i++)
+    for (let i = 0; i < 16; i++)
       out1[i] ^= op_c[i];
 
-    for (i = 0; i < 8; i++)
+    const mac_a = new Uint8Array(8);
+
+    for (let i = 0; i < 8; i++)
       mac_a[i] = out1[i];
 
     return { mac_a };
@@ -66,19 +66,13 @@ module.exports = function Milenage(op, k) {
     *
     *-----------------------------------------------------------------*/
   function f2345(rand) {
-    const res = new Uint8Array(8);
-    const ck = new Uint8Array(16);
-    const ik = new Uint8Array(16);
-    const ak = new Uint8Array(6);
-
-    const rijndaelInput = new Uint8Array(16);
-    let i;
-
     const cipher = crypto.createCipheriv('aes-128-ecb', k, Buffer.alloc(0));
 
     const op_c = computeOpc(cipher);
 
-    for (i = 0; i < 16; i++)
+    const rijndaelInput = new Uint8Array(16);
+
+    for (let i = 0; i < 16; i++)
       rijndaelInput[i] = rand[i] ^ op_c[i];
 
     const temp = Uint8Array.from(cipher.update(rijndaelInput));
@@ -87,54 +81,62 @@ module.exports = function Milenage(op, k) {
      * rotate by r2=0, and XOR on the constant c2 (which *
      * is all zeroes except that the last bit is 1). */
 
-    for (i = 0; i < 16; i++)
+    for (let i = 0; i < 16; i++)
       rijndaelInput[i] = temp[i] ^ op_c[i];
 
     rijndaelInput[15] ^= 1;
 
     let out = Uint8Array.from(cipher.update(rijndaelInput));
 
-    for (i = 0; i < 16; i++)
+    for (let i = 0; i < 16; i++)
       out[i] ^= op_c[i];
 
-    for (i = 0; i < 8; i++)
+    const res = new Uint8Array(8);
+
+    for (let i = 0; i < 8; i++)
       res[i] = out[i + 8];
 
-    for (i = 0; i < 6; i++)
+    const ak = new Uint8Array(6);
+
+    for (let i = 0; i < 6; i++)
       ak[i] = out[i];
 
     /* To obtain output block OUT3: XOR OPc and TEMP, *
      * rotate by r3=32, and XOR on the constant c3 (which *
      * is all zeroes except that the next to last bit is 1). */
 
-    for (i = 0; i < 16; i++)
+    for (let i = 0; i < 16; i++)
       rijndaelInput[(i + 12) % 16] = temp[i] ^ op_c[i];
 
     rijndaelInput[15] ^= 2;
 
     out = Uint8Array.from(cipher.update(rijndaelInput));
 
-    for (i = 0; i < 16; i++)
+    for (let i = 0; i < 16; i++)
       out[i] ^= op_c[i];
 
-    for (i = 0; i < 16; i++)
+    const ck = new Uint8Array(16);
+
+    for (let i = 0; i < 16; i++)
       ck[i] = out[i];
 
     /* To obtain output block OUT4: XOR OPc and TEMP, *
      * rotate by r4=64, and XOR on the constant c4 (which *
      * is all zeroes except that the 2nd from last bit is 1). */
 
-    for (i = 0; i < 16; i++)
+    for (let i = 0; i < 16; i++)
       rijndaelInput[(i + 8) % 16] = temp[i] ^ op_c[i];
 
     rijndaelInput[15] ^= 4;
 
     out = Uint8Array.from(cipher.update(rijndaelInput));
 
-    for (i = 0; i < 16; i++)
+    for (let i = 0; i < 16; i++)
       out[i] ^= op_c[i];
 
-    for (i = 0; i < 16; i++)
+    const ik = new Uint8Array(16);
+
+    for (let i = 0; i < 16; i++)
       ik[i] = out[i];
 
     return { res, ck, ik, ak };
@@ -150,27 +152,25 @@ module.exports = function Milenage(op, k) {
    *
    *-----------------------------------------------------------------*/
   function f1star(rand, sqn, amf) {
-    const mac_s = new Uint8Array(8);
-
-    const in1 = new Uint8Array(16);
-    const rijndaelInput = new Uint8Array(16);
-    let i;
-
     const cipher = crypto.createCipheriv('aes-128-ecb', k, Buffer.alloc(0));
 
     const op_c = computeOpc(cipher);
 
-    for (i = 0; i < 16; i++)
+    const rijndaelInput = new Uint8Array(16);
+
+    for (let i = 0; i < 16; i++)
       rijndaelInput[i] = rand[i] ^ op_c[i];
 
     const temp = Uint8Array.from(cipher.update(rijndaelInput));
 
-    for (i = 0; i < 6; i++) {
+    const in1 = new Uint8Array(16);
+
+    for (let i = 0; i < 6; i++) {
       in1[i] = sqn[i];
       in1[i + 8] = sqn[i];
     }
 
-    for (i = 0; i < 2; i++) {
+    for (let i = 0; i < 2; i++) {
       in1[i + 6] = amf[i];
       in1[i + 14] = amf[i];
     }
@@ -178,19 +178,21 @@ module.exports = function Milenage(op, k) {
     /* XOR op_c and in1, rotate by r1=64, and XOR *
      * on the constant c1 (which is all zeroes) */
 
-    for (i = 0; i < 16; i++)
+    for (let i = 0; i < 16; i++)
       rijndaelInput[(i + 8) % 16] = in1[i] ^ op_c[i];
 
     /* XOR on the value temp computed before */
-    for (i = 0; i < 16; i++)
+    for (let i = 0; i < 16; i++)
       rijndaelInput[i] ^= temp[i];
 
     const out1 = Uint8Array.from(cipher.update(rijndaelInput));
 
-    for (i = 0; i < 16; i++)
+    for (let i = 0; i < 16; i++)
       out1[i] ^= op_c[i];
 
-    for (i = 0; i < 8; i++)
+    const mac_s = new Uint8Array(8);
+
+    for (let i = 0; i < 8; i++)
       mac_s[i] = out1[i + 8];
 
     return { mac_s };
@@ -205,16 +207,13 @@ module.exports = function Milenage(op, k) {
    *
    *-----------------------------------------------------------------*/
   function f5star(rand) {
-    const ak_s = new Uint8Array(8);
-
-    const rijndaelInput = new Uint8Array(16);
-    let i;
-
     const cipher = crypto.createCipheriv('aes-128-ecb', k, Buffer.alloc(0));
 
     const op_c = computeOpc(cipher);
 
-    for (i = 0; i < 16; i++)
+    const rijndaelInput = new Uint8Array(16);
+
+    for (let i = 0; i < 16; i++)
       rijndaelInput[i] = rand[i] ^ op_c[i];
 
     const temp = Uint8Array.from(cipher.update(rijndaelInput));
@@ -222,17 +221,19 @@ module.exports = function Milenage(op, k) {
     /* To obtain output block OUT5: XOR OPc and TEMP, *
     * rotate by r5=96, and XOR on the constant c5 (which *
     * is all zeroes except that the 3rd from last bit is 1). */
-    for (i = 0; i < 16; i++)
+    for (let i = 0; i < 16; i++)
       rijndaelInput[(i + 4) % 16] = temp[i] ^ op_c[i];
 
     rijndaelInput[15] ^= 8;
 
     const out = Uint8Array.from(cipher.update(rijndaelInput));
 
-    for (i = 0; i < 16; i++)
+    for (let i = 0; i < 16; i++)
       out[i] ^= op_c[i];
 
-    for (i = 0; i < 6; i++)
+    const ak_s = new Uint8Array(8);
+
+    for (let i = 0; i < 6; i++)
       ak_s[i] = out[i];
 
     return { ak_s };
@@ -245,9 +246,7 @@ module.exports = function Milenage(op, k) {
   function computeOpc(cipher) {
     const op_c = Uint8Array.from(cipher.update(op));
 
-    let i;
-
-    for (i = 0; i < 16; i++)
+    for (let i = 0; i < 16; i++)
       op_c[i] ^= op[i];
 
     return op_c;
