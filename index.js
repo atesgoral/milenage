@@ -1,4 +1,4 @@
-const rijndael = require('./rijndael');
+const crypto = require('crypto');
 
 module.exports = function Milenage(op, k) {
   /*-------------------------------------------------------------------
@@ -13,21 +13,18 @@ module.exports = function Milenage(op, k) {
   function f1(rand, sqn, amf) {
     const mac_a = new Uint8Array(8);
 
-    const op_c = new Uint8Array(16);
-    const temp = new Uint8Array(16);
     const in1 = new Uint8Array(16);
-    const out1 = new Uint8Array(16);
     const rijndaelInput = new Uint8Array(16);
     let i;
 
-    rijndael.keySchedule(k);
+    const cipher = crypto.createCipheriv('aes-128-ecb', k, Buffer.alloc(0));
 
-    computeOpc(op_c);
+    const op_c = computeOpc(cipher);
 
     for (i = 0; i < 16; i++) // @todo unroll?
       rijndaelInput[i] = rand[i] ^ op_c[i];
 
-    rijndael.encrypt(rijndaelInput, temp);
+    const temp = Uint8Array.from(cipher.update(rijndaelInput));
 
     for (i = 0; i < 6; i++) { // @todo unroll?
       in1[i] = sqn[i];
@@ -49,7 +46,7 @@ module.exports = function Milenage(op, k) {
     for (i = 0; i < 16; i++)
       rijndaelInput[i] ^= temp[i];
 
-    rijndael.encrypt(rijndaelInput, out1);
+    const out1 = Uint8Array.from(cipher.update(rijndaelInput));
 
     for (i = 0; i < 16; i++)
       out1[i] ^= op_c[i];
@@ -74,20 +71,17 @@ module.exports = function Milenage(op, k) {
     const ik = new Uint8Array(16);
     const ak = new Uint8Array(6);
 
-    const op_c = new Uint8Array(16);
-    const temp = new Uint8Array(16);
-    const out = new Uint8Array(16);
     const rijndaelInput = new Uint8Array(16);
     let i;
 
-    rijndael.keySchedule(k);
+    const cipher = crypto.createCipheriv('aes-128-ecb', k, Buffer.alloc(0));
 
-    computeOpc(op_c);
+    const op_c = computeOpc(cipher);
 
     for (i = 0; i < 16; i++)
       rijndaelInput[i] = rand[i] ^ op_c[i];
 
-    rijndael.encrypt(rijndaelInput, temp);
+    const temp = Uint8Array.from(cipher.update(rijndaelInput));
 
     /* To obtain output block OUT2: XOR OPc and TEMP, *
      * rotate by r2=0, and XOR on the constant c2 (which *
@@ -98,7 +92,7 @@ module.exports = function Milenage(op, k) {
 
     rijndaelInput[15] ^= 1;
 
-    rijndael.encrypt(rijndaelInput, out);
+    let out = Uint8Array.from(cipher.update(rijndaelInput));
 
     for (i = 0; i < 16; i++)
       out[i] ^= op_c[i];
@@ -118,7 +112,7 @@ module.exports = function Milenage(op, k) {
 
     rijndaelInput[15] ^= 2;
 
-    rijndael.encrypt(rijndaelInput, out);
+    out = Uint8Array.from(cipher.update(rijndaelInput));
 
     for (i = 0; i < 16; i++)
       out[i] ^= op_c[i];
@@ -135,7 +129,7 @@ module.exports = function Milenage(op, k) {
 
     rijndaelInput[15] ^= 4;
 
-    rijndael.encrypt(rijndaelInput, out);
+    out = Uint8Array.from(cipher.update(rijndaelInput));
 
     for (i = 0; i < 16; i++)
       out[i] ^= op_c[i];
@@ -158,21 +152,18 @@ module.exports = function Milenage(op, k) {
   function f1star(rand, sqn, amf) {
     const mac_s = new Uint8Array(8);
 
-    const op_c = new Uint8Array(16);
-    const temp = new Uint8Array(16);
     const in1 = new Uint8Array(16);
-    const out1 = new Uint8Array(16);
     const rijndaelInput = new Uint8Array(16);
     let i;
 
-    rijndael.keySchedule(k);
+    const cipher = crypto.createCipheriv('aes-128-ecb', k, Buffer.alloc(0));
 
-    computeOpc(op_c);
+    const op_c = computeOpc(cipher);
 
     for (i = 0; i < 16; i++)
       rijndaelInput[i] = rand[i] ^ op_c[i];
 
-    rijndael.encrypt(rijndaelInput, temp);
+    const temp = Uint8Array.from(cipher.update(rijndaelInput));
 
     for (i = 0; i < 6; i++) {
       in1[i] = sqn[i];
@@ -194,7 +185,7 @@ module.exports = function Milenage(op, k) {
     for (i = 0; i < 16; i++)
       rijndaelInput[i] ^= temp[i];
 
-    rijndael.encrypt(rijndaelInput, out1);
+    const out1 = Uint8Array.from(cipher.update(rijndaelInput));
 
     for (i = 0; i < 16; i++)
       out1[i] ^= op_c[i];
@@ -216,20 +207,17 @@ module.exports = function Milenage(op, k) {
   function f5star(rand) {
     const ak_s = new Uint8Array(8);
 
-    const op_c = new Uint8Array(16);
-    const temp = new Uint8Array(16);
-    const out = new Uint8Array(16);
     const rijndaelInput = new Uint8Array(16);
     let i;
 
-    rijndael.keySchedule(k);
+    const cipher = crypto.createCipheriv('aes-128-ecb', k, Buffer.alloc(0));
 
-    computeOpc(op_c);
+    const op_c = computeOpc(cipher);
 
     for (i = 0; i < 16; i++)
       rijndaelInput[i] = rand[i] ^ op_c[i];
 
-    rijndael.encrypt(rijndaelInput, temp);
+    const temp = Uint8Array.from(cipher.update(rijndaelInput));
 
     /* To obtain output block OUT5: XOR OPc and TEMP, *
     * rotate by r5=96, and XOR on the constant c5 (which *
@@ -239,7 +227,7 @@ module.exports = function Milenage(op, k) {
 
     rijndaelInput[15] ^= 8;
 
-    rijndael.encrypt(rijndaelInput, out);
+    const out = Uint8Array.from(cipher.update(rijndaelInput));
 
     for (i = 0; i < 16; i++)
       out[i] ^= op_c[i];
@@ -254,13 +242,15 @@ module.exports = function Milenage(op, k) {
    * Function to compute OPc from OP and K. Assumes key schedule has
    * already been performed.
    *-----------------------------------------------------------------*/
-  function computeOpc(op_c) {
-    let i;
+  function computeOpc(cipher) {
+    const op_c = Uint8Array.from(cipher.update(op));
 
-    rijndael.encrypt(op, op_c);
+    let i;
 
     for (i = 0; i < 16; i++)
       op_c[i] ^= op[i];
+
+    return op_c;
   }
 
   return {
