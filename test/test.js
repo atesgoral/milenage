@@ -16,12 +16,13 @@ test((t) => {
 
   const milenage = new Milenage(op, key);
 
-  const { mac_a } = milenage.f1(rand, sqn, amf);
+  const { op_c, mac_a } = milenage.f1(rand, sqn, amf);
   const { res, ck, ik, ak } = milenage.f2345(rand);
 
   const { mac_s } = milenage.f1star(rand, sqn, amf);
   const { ak_s } = milenage.f5star(rand);
 
+  t.deepEqual(op_c, u8a('a02c025b3be2563be23da39144606a55'));
   t.deepEqual(mac_a, u8a('f86047d2eb765959'));
   t.deepEqual(res, u8a('840b43b100c3d683'));
   t.deepEqual(ck, u8a('546ab82e492916dacbaf66ba9d7e6654'));

@@ -32,6 +32,12 @@ const { mac_s } = milenage.f1star(rand, sqn, amf);
 const { ak_s } = milenage.f5star(rand);
 ```
 
+All functions also return the OPc value as the `op_c` property:
+
+```
+const { op_c } = milenage.f1(rand, sqn, amf);
+```
+
 All inputs and outputs are `Uint8Array` instances.
 
 Inputs:
@@ -45,6 +51,7 @@ f1*, f2, f3, f4, f5 and f5*.
 
 Outputs:
 
+- `op_c` is the **OPc**: The value derived from OP and K.
 - `mac_a` is the **MAC-A**: a 64-bit network authentication code that is the output of the function f1.
 - `res` is the **RES**: a 64-bit signed response that is the output of the function f2.
 - `ck` is the **CK**: a 128-bit confidentiality key that is the output of the function f3.

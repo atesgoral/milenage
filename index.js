@@ -54,7 +54,7 @@ module.exports = function Milenage(op, k) {
     for (let i = 0; i < 8; i++)
       mac_a[i] = out1[i];
 
-    return { mac_a };
+    return { op_c, mac_a };
   }
 
    /*-------------------------------------------------------------------
@@ -139,7 +139,7 @@ module.exports = function Milenage(op, k) {
     for (let i = 0; i < 16; i++)
       ik[i] = out[i];
 
-    return { res, ck, ik, ak };
+    return { op_c, res, ck, ik, ak };
   }
 
   /*-------------------------------------------------------------------
@@ -195,7 +195,7 @@ module.exports = function Milenage(op, k) {
     for (let i = 0; i < 8; i++)
       mac_s[i] = out1[i + 8];
 
-    return { mac_s };
+    return { op_c, mac_s };
   }
 
   /*-------------------------------------------------------------------
@@ -236,7 +236,7 @@ module.exports = function Milenage(op, k) {
     for (let i = 0; i < 6; i++)
       ak_s[i] = out[i];
 
-    return { ak_s };
+    return { op_c, ak_s };
   }
 
   /*-------------------------------------------------------------------
