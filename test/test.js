@@ -6,13 +6,13 @@ function u8a(s) {
   return Uint8Array.from(Buffer.from(s, 'hex'));
 }
 
-test('op', (t) => {
+test('op_c', (t) => {
   const op = u8a('00112233445566778899AABBCCDDEEFF');
   const key = u8a('11111111111111111111111111111111');
 
   const milenage = new Milenage({ op, key });
 
-  const op_c = milenage.opc();
+  const op_c = milenage.op_c();
 
   t.deepEqual(op_c, u8a('a02c025b3be2563be23da39144606a55'));
 });
@@ -45,14 +45,14 @@ test('All functions with OP', (t) => {
 });
 
 test('All functions with OPc', (t) => {
-  const opc = u8a('a02c025b3be2563be23da39144606a55');
+  const op_c_in = u8a('a02c025b3be2563be23da39144606a55');
   const amf = u8a('0000');
 
   const key = u8a('11111111111111111111111111111111');
   const rand = u8a('55555555555555555555555555555555');
   const sqn = u8a('000000000001');
 
-  const milenage = new Milenage({ opc, key });
+  const milenage = new Milenage({ op_c: op_c_in, key });
 
   const { op_c, mac_a } = milenage.f1(rand, sqn, amf);
   const { res, ck, ik, ak } = milenage.f2345(rand);

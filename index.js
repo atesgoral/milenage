@@ -1,10 +1,10 @@
 const crypto = require('crypto');
 
 module.exports = function Milenage(params) {
-  function opc() {
+  function op_c() {
     const cipher = crypto.createCipheriv('aes-128-ecb', params.key, Buffer.alloc(0));
 
-    return params.opc || computeOpc(cipher);
+    return params.op_c || computeOpc(cipher);
   }
 
   /*-------------------------------------------------------------------
@@ -19,7 +19,7 @@ module.exports = function Milenage(params) {
   function f1(rand, sqn, amf) {
     const cipher = crypto.createCipheriv('aes-128-ecb', params.key, Buffer.alloc(0));
 
-    const op_c = params.opc || computeOpc(cipher);
+    const op_c = params.op_c || computeOpc(cipher);
 
     const rijndaelInput = new Uint8Array(16);
 
@@ -74,7 +74,7 @@ module.exports = function Milenage(params) {
   function f2345(rand) {
     const cipher = crypto.createCipheriv('aes-128-ecb', params.key, Buffer.alloc(0));
 
-    const op_c = params.opc || computeOpc(cipher);
+    const op_c = params.op_c || computeOpc(cipher);
 
     const rijndaelInput = new Uint8Array(16);
 
@@ -160,7 +160,7 @@ module.exports = function Milenage(params) {
   function f1star(rand, sqn, amf) {
     const cipher = crypto.createCipheriv('aes-128-ecb', params.key, Buffer.alloc(0));
 
-    const op_c = params.opc || computeOpc(cipher);
+    const op_c = params.op_c || computeOpc(cipher);
 
     const rijndaelInput = new Uint8Array(16);
 
@@ -215,7 +215,7 @@ module.exports = function Milenage(params) {
   function f5star(rand) {
     const cipher = crypto.createCipheriv('aes-128-ecb', params.key, Buffer.alloc(0));
 
-    const op_c = params.opc || computeOpc(cipher);
+    const op_c = params.op_c || computeOpc(cipher);
 
     const rijndaelInput = new Uint8Array(16);
 
@@ -255,7 +255,7 @@ module.exports = function Milenage(params) {
   }
 
   return {
-    opc,
+    op_c,
     f1,
     f2345,
     f1star,

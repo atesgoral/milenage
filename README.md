@@ -21,7 +21,7 @@ Then:
 ```
 const Milenage = require('milenage');
 
-const milenage = new Milenage({ op, key }); // Or: new Milenage({ opc, key });
+const milenage = new Milenage({ op, key }); // Or: new Milenage({ op_c, key });
 
 const { mac_a } = milenage.f1(rand, sqn, amf);
 const { res, ck, ik, ak } = milenage.f2345(rand);
@@ -40,7 +40,7 @@ const { op_c } = milenage.f1(rand, sqn, amf);
 You can also just get the OPc value by:
 
 ```
-const op_c = milenage.opc();
+const op_c = milenage.op_c();
 ```
 
 All inputs and outputs are `Uint8Array` instances.
@@ -49,7 +49,7 @@ Inputs:
 
 - `op` is the **OP**: a 128-bit Operator Variant Algorithm Configuration Field that is a component of the functions f1,
 f1*, f2, f3, f4, f5 and f5*.
-- `opc` is the **OPc**: The intermediate value derived from a combination of OP and K for use in functions. If OPc is passed in, OP is ignored and functions start off their computations based on the OPc value you have provided.
+- `op_c` is the **OPc**: The intermediate value derived from a combination of OP and K for use in functions. If OPc is passed in, OP is ignored and functions start off their computations based on the OPc value you have provided.
 - `key` is the **K**: a 128-bit subscriber key that is an input to the functions f1, f1*, f2, f3, f4, f5 and f5*.
 - `rand` is the **RAND**: a 128-bit random challenge that is an input to the functions f1, f1*, f2, f3, f4, f5 and f5*.
 - `sqn` is the **SQN**: a 48-bit sequence number that is an input to either of the functions f1 and f1*. (For f1* this input is more precisely called SQN<sub>MS</sub>.)
