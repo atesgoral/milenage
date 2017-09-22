@@ -4,7 +4,8 @@
   "description": "3GPP authentication and key generation functions (MILENAGE)",
   "main": "index.js",
   "scripts": {
-    "test": "ava"
+    "test": "ava",
+    "coverage": "nyc ava && nyc report --reporter=html"
   },
   "repository": {
     "type": "git",
@@ -21,6 +22,7 @@
   },
   "homepage": "https://github.com/atesgoral/milenage#readme",
   "devDependencies": {
-    "ava": "^0.19.1"
+    "ava": "^0.19.1",
+    "nyc": "^11.2.1"
   }
 }

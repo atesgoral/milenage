@@ -1,3 +1,7 @@
+[![Travis CI](https://img.shields.io/travis/atesgoral/milenage.svg)](https://travis-ci.org/atesgoral/milenage)
+[![Coverage Status](https://img.shields.io/coveralls/atesgoral/milenage.svg)](https://coveralls.io/github/atesgoral/milenage?branch=master)
+[![NPM Package](https://img.shields.io/npm/v/milenage.svg)](https://www.npmjs.com/package/milenage)
+
 # MILENAGE
 
 3GPP authentication and key generation functions.
