@@ -28,12 +28,19 @@ const { res, ck, ik, ak } = milenage.f2345(rand);
 
 const { mac_s } = milenage.f1star(rand, sqn, amf);
 const { ak_s } = milenage.f5star(rand);
+
 ```
 
 All functions also return the OPc value as the `op_c` property:
 
 ```
 const { op_c } = milenage.f1(rand, sqn, amf);
+```
+
+You can also just get the OPc value by:
+
+```
+const op_c = milenage.opc();
 ```
 
 All inputs and outputs are `Uint8Array` instances.

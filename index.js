@@ -1,6 +1,12 @@
 const crypto = require('crypto');
 
 module.exports = function Milenage(params) {
+  function opc() {
+    const cipher = crypto.createCipheriv('aes-128-ecb', params.key, Buffer.alloc(0));
+
+    return params.opc || computeOpc(cipher);
+  }
+
   /*-------------------------------------------------------------------
    * Algorithm f1
    *-------------------------------------------------------------------
@@ -249,6 +255,7 @@ module.exports = function Milenage(params) {
   }
 
   return {
+    opc,
     f1,
     f2345,
     f1star,

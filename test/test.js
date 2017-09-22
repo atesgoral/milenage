@@ -6,7 +6,18 @@ function u8a(s) {
   return Uint8Array.from(Buffer.from(s, 'hex'));
 }
 
-test('With OP', (t) => {
+test('op', (t) => {
+  const op = u8a('00112233445566778899AABBCCDDEEFF');
+  const key = u8a('11111111111111111111111111111111');
+
+  const milenage = new Milenage({ op, key });
+
+  const op_c = milenage.opc();
+
+  t.deepEqual(op_c, u8a('a02c025b3be2563be23da39144606a55'));
+});
+
+test('All functions with OP', (t) => {
   const op = u8a('00112233445566778899AABBCCDDEEFF');
   const amf = u8a('0000');
 
@@ -33,7 +44,7 @@ test('With OP', (t) => {
   t.deepEqual(ak_s, u8a('429a4587dce30000'));
 });
 
-test('With OPc', (t) => {
+test('All functions with OPc', (t) => {
   const opc = u8a('a02c025b3be2563be23da39144606a55');
   const amf = u8a('0000');
 
