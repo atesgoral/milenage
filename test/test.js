@@ -14,7 +14,7 @@ test((t) => {
   const rand = u8a('55555555555555555555555555555555');
   const sqn = u8a('000000000001');
 
-  const milenage = new Milenage(op, key);
+  const milenage = new Milenage({ op, key });
 
   const { op_c, mac_a } = milenage.f1(rand, sqn, amf);
   const { res, ck, ik, ak } = milenage.f2345(rand);

@@ -1,6 +1,6 @@
 const crypto = require('crypto');
 
-module.exports = function Milenage(op, k) {
+module.exports = function Milenage(params) {
   /*-------------------------------------------------------------------
    * Algorithm f1
    *-------------------------------------------------------------------
@@ -11,7 +11,7 @@ module.exports = function Milenage(op, k) {
    *
    *-----------------------------------------------------------------*/
   function f1(rand, sqn, amf) {
-    const cipher = crypto.createCipheriv('aes-128-ecb', k, Buffer.alloc(0));
+    const cipher = crypto.createCipheriv('aes-128-ecb', params.key, Buffer.alloc(0));
 
     const op_c = computeOpc(cipher);
 
@@ -66,7 +66,7 @@ module.exports = function Milenage(op, k) {
     *
     *-----------------------------------------------------------------*/
   function f2345(rand) {
-    const cipher = crypto.createCipheriv('aes-128-ecb', k, Buffer.alloc(0));
+    const cipher = crypto.createCipheriv('aes-128-ecb', params.key, Buffer.alloc(0));
 
     const op_c = computeOpc(cipher);
 
@@ -152,7 +152,7 @@ module.exports = function Milenage(op, k) {
    *
    *-----------------------------------------------------------------*/
   function f1star(rand, sqn, amf) {
-    const cipher = crypto.createCipheriv('aes-128-ecb', k, Buffer.alloc(0));
+    const cipher = crypto.createCipheriv('aes-128-ecb', params.key, Buffer.alloc(0));
 
     const op_c = computeOpc(cipher);
 
@@ -207,7 +207,7 @@ module.exports = function Milenage(op, k) {
    *
    *-----------------------------------------------------------------*/
   function f5star(rand) {
-    const cipher = crypto.createCipheriv('aes-128-ecb', k, Buffer.alloc(0));
+    const cipher = crypto.createCipheriv('aes-128-ecb', params.key, Buffer.alloc(0));
 
     const op_c = computeOpc(cipher);
 
@@ -239,15 +239,11 @@ module.exports = function Milenage(op, k) {
     return { op_c, ak_s };
   }
 
-  /*-------------------------------------------------------------------
-   * Function to compute OPc from OP and K. Assumes key schedule has
-   * already been performed.
-   *-----------------------------------------------------------------*/
   function computeOpc(cipher) {
-    const op_c = Uint8Array.from(cipher.update(op));
+    const op_c = Uint8Array.from(cipher.update(params.op));
 
     for (let i = 0; i < 16; i++)
-      op_c[i] ^= op[i];
+      op_c[i] ^= params.op[i];
 
     return op_c;
   }
