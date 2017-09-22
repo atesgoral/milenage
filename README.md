@@ -16,18 +16,12 @@ Install from npm:
 npm install --save milenage
 ```
 
-Or:
-
-```
-yarn add milenage
-```
-
 Then:
 
 ```
 const Milenage = require('milenage');
 
-const milenage = new Milenage(op, key);
+const milenage = new Milenage({ op, key }); // Or: new Milenage({ opc, key });
 
 const { mac_a } = milenage.f1(rand, sqn, amf);
 const { res, ck, ik, ak } = milenage.f2345(rand);
@@ -48,6 +42,7 @@ Inputs:
 
 - `op` is the **OP**: a 128-bit Operator Variant Algorithm Configuration Field that is a component of the functions f1,
 f1*, f2, f3, f4, f5 and f5*.
+- `opc` is the **OPc**: The intermediate value derived from a combination of OP and K for use in functions. If OPc is passed in, OP is ignored and functions start off their computations based on the OPc value you have provided.
 - `key` is the **K**: a 128-bit subscriber key that is an input to the functions f1, f1*, f2, f3, f4, f5 and f5*.
 - `rand` is the **RAND**: a 128-bit random challenge that is an input to the functions f1, f1*, f2, f3, f4, f5 and f5*.
 - `sqn` is the **SQN**: a 48-bit sequence number that is an input to either of the functions f1 and f1*. (For f1* this input is more precisely called SQN<sub>MS</sub>.)
@@ -55,7 +50,7 @@ f1*, f2, f3, f4, f5 and f5*.
 
 Outputs:
 
-- `op_c` is the **OPc**: The value derived from OP and K.
+- `op_c` is the **OPc**: The value derived from OP and K. This will be the same value as the optional opc input parameter.
 - `mac_a` is the **MAC-A**: a 64-bit network authentication code that is the output of the function f1.
 - `res` is the **RES**: a 64-bit signed response that is the output of the function f2.
 - `ck` is the **CK**: a 128-bit confidentiality key that is the output of the function f3.
@@ -75,8 +70,7 @@ const rand = new Uint8Array([ 0xdc, 0xef, 0xf0, 0x15, 0xac, 0xa4, 0x44, 0x3b, 0x
 const sqn = new Uint8Array([ 0x00, 0x00, 0x00, 0x00, 0x00, 0x95 ]);
 const amf = new Uint8Array([ 0x80, 0x00 ]);
 
-
-const milenage = new Milenage(op, key);
+const milenage = new Milenage({ op, key });
 
 const { mac_a } = milenage.f1(rand, sqn, amf);
 const { res, ck, ik, ak } = milenage.f2345(rand);
